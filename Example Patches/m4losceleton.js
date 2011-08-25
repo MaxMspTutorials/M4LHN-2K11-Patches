@@ -2,6 +2,7 @@
 
 //a js/m4l router for osc information from OSCeleton
 //FYI SINGLE USER MODE ONLY!
+
 //the usuals
 autowatch = 1;
 inlets = 2;
@@ -14,7 +15,7 @@ var selectedParameter; //selected device
 var mapLeft = false;
 var mapRight = false;
 
-//some functions
+//build a basic data type to hold joint info
 var joint = function(thisx, thisy, thisz, thisname) {
     this.name = thisname;
     this.x = thisx;
@@ -24,6 +25,7 @@ var joint = function(thisx, thisy, thisz, thisname) {
     this.minmax = [1.,1.];
     return this;
 }
+//extend the data type to hold an update function
 joint.prototype.update = function(thisx, thisy, thisz) {
     this.x = thisx;
     this.y = thisy;
@@ -66,20 +68,21 @@ joint.prototype.update = function(thisx, thisy, thisz) {
     }
 
 }
+//extend it again to add a map function
 joint.prototype.map = function(val) {
     if (val === "X" || val === "Y" || val === "Z") {
         this.mappedAxis = val;
      
     }
 }
+//using object-notation to create a user to hold our joints
 var user = {
     l_hand: new joint(.5,.5,.5,"l_hand"),
     r_hand: new joint(.5,.5,.5,"r_hand"),
     l_param: null,
     r_param: null
 };
-
-
+//functions to be called from max, bang draws the lcd UI
 function bang() {
     outlet(1,"clear");
     if (user["l_hand"]) {     
@@ -89,9 +92,7 @@ function bang() {
         outlet(1,"frameoval",Number(user["r_hand"].x *lcdWidth),Number(user["r_hand"].y*lcdHeight),Number((user["r_hand"].x *lcdWidth)+ 10),Number((user["r_hand"].y*lcdHeight)+10));
     }
 }
-
-
-//initialize the LiveAPI stuff
+//init initializes the LiveAPI stuff
 function init() {
     selectedParameter = new LiveAPI(selectedParameterCallback,"live_set view selected_parameter");
     selectedParameter.mode = 1;
@@ -100,7 +101,7 @@ function init() {
     user["l_hand"] = new joint(.5,.5,.5,"l_hand");
     user["r_hand"] = new joint(.5,.5,.5, "r_hand");
 }
-
+//this is a callback function for our selectedParameter
 function selectedParameterCallback(args) {
     if (args[0] === "id") {
         if (mapLeft === true) {
@@ -119,6 +120,7 @@ function selectedParameterCallback(args) {
         }
     }
 }
+//and one for our left hand
 function l_paramCallback(args) {
     if(args[0] === "value") {
         //value changed in Live
@@ -128,6 +130,7 @@ function l_paramCallback(args) {
     outlet(0,"l_hand","setminmax",user["l_param"].get("min"),user["l_param"].get("max"));	    
     }    
 }
+//and for our right hand
 function r_paramCallback(args) {
     if(args[0] === "value") {
         //value changed in Live
@@ -138,8 +141,7 @@ function r_paramCallback(args) {
     }
 }
 
-
-
+//anything catches any message not mapped to a function and checks its args
 function anything() {
     callingargs = arrayfromargs(arguments);
      if (inlet === 1) {
