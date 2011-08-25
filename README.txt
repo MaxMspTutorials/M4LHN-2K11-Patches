@@ -10,7 +10,7 @@ M4L.osceleton.amxd - osceleton router for M4L
 List of corresponding JS files:
 tweenFunctions.js -- functionSelector.amxd
 tween.js -- tween functions from MaxObjectsDatabase
-osceleton.js -- M4L.osceleton.amxd
+m4losceleton.js -- M4L.osceleton.amxd
 selectedParameterList.js -- selectedParameter.amxd
 
 note: for info on using the M4L.osceleton object, look at the Kinect instructions
